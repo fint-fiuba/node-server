@@ -1,13 +1,16 @@
 import mongoose from 'mongoose';
 
+type Species = "DOG" | "CAT";
+type Sex = "MALE" | "FEMALE";
+
 interface IUser {
   firstName: String;
   lastName: String;
   mail: String;
   password: String;
-  petCategory: String;
+  petCategory: Species;
   petName: String;
-  petSex: String;
+  petSex: Sex;
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {

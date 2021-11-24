@@ -30,4 +30,18 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/nextmatch', async (req: Request, res: Response) => {
+  const { _firstName, _lastName, _petCategory, _petSex } =
+    req.body;
+
+  const otroUser = User.find({
+    firstName: { $ne: _firstName },
+    lastName: { $ne: _lastName },
+    petCategory: _petCategory,
+    petSex: { $ne: _petSex },
+  });
+
+  return res.status(200).send(otroUser);
+});
+
 export { router as UserRouter };
