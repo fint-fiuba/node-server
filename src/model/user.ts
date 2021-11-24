@@ -12,6 +12,7 @@ interface IUser {
   petCategory: Species;
   petName: String;
   petSex: Sex;
+  prevMatches: [String];
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -27,6 +28,7 @@ interface UserDoc extends mongoose.Document {
   petCategory: String;
   petName: String;
   petSex: String;
+  prevMatches: [String];
 }
 
 const userSchema = new mongoose.Schema({
@@ -64,6 +66,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: ['MALE', 'FEMALE'],
+  },
+  prevMatches: {
+    type: [String],
+    required: true,
   },
 });
 

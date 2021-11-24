@@ -15,6 +15,7 @@ router.post('/register', async (req: Request, res: Response) => {
     req.body;
 
   const id = uuidv4();
+  const prevMatches: [String] = [id];
 
   try {
     const user = User.build({
@@ -26,6 +27,7 @@ router.post('/register', async (req: Request, res: Response) => {
       petCategory,
       petName,
       petSex,
+      prevMatches,
     });
     await user.save();
     return res.status(201).send();
@@ -35,6 +37,7 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
+// pongo /nextmatch como algo temporal
 router.post('/nextmatch', async (req: Request, res: Response) => {
   const { _id } =
     req.body;
@@ -43,9 +46,9 @@ router.post('/nextmatch', async (req: Request, res: Response) => {
 
   if (user === null) return;
 
-  const otroUser = await User.find({
-    id: { $ne: user.id },
-    petSex: { $ne: user.petSex }
+  const otroUser = await User.findOne({
+    id: { $ne: user.id, $nin: user.prevMatches },
+    petSex: { $ne: user.petSex },
   })
 
   return res.status(200).send(otroUser);
