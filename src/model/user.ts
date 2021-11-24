@@ -4,6 +4,7 @@ type Species = "DOG" | "CAT";
 type Sex = "MALE" | "FEMALE";
 
 interface IUser {
+  id: String;
   firstName: String;
   lastName: String;
   mail: String;
@@ -18,6 +19,7 @@ interface UserModelInterface extends mongoose.Model<UserDoc> {
 }
 
 interface UserDoc extends mongoose.Document {
+  id: String;
   firstName: String;
   lastName: String;
   mail: String;
@@ -28,6 +30,11 @@ interface UserDoc extends mongoose.Document {
 }
 
 const userSchema = new mongoose.Schema({
+  id: {
+    type: String,
+    required: true,
+  },
+
   firstName: {
     type: String,
     required: true,

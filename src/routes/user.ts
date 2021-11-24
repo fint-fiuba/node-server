@@ -1,4 +1,6 @@
 import express, { Request, Response } from 'express';
+const { v4: uuidv4 } = require('uuid');
+
 import { User } from '../model/user';
 
 const router = express.Router();
@@ -12,8 +14,11 @@ router.post('/register', async (req: Request, res: Response) => {
   const { firstName, lastName, mail, password, petCategory, petName, petSex } =
     req.body;
 
+  const id = uuidv4();
+
   try {
     const user = User.build({
+      id,
       firstName,
       lastName,
       mail,
@@ -31,15 +36,17 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 router.post('/nextmatch', async (req: Request, res: Response) => {
-  const { _firstName, _lastName, _petCategory, _petSex } =
+  const { _id } =
     req.body;
 
-  const otroUser = User.find({
-    firstName: { $ne: _firstName },
-    lastName: { $ne: _lastName },
-    petCategory: _petCategory,
-    petSex: { $ne: _petSex },
-  });
+  const user = await User.findOne({ id: _id });
+
+  if (user === null) return;
+
+  const otroUser = await User.find({
+    id: { $ne: user.id },
+    petSex: { $ne: user.petSex }
+  })
 
   return res.status(200).send(otroUser);
 });
