@@ -15,7 +15,9 @@ router.post('/register', async (req: Request, res: Response) => {
     req.body;
 
   const id = uuidv4();
+  //Para no inicializarlas vacias
   const prevMatches: [String] = [id];
+  const prevRejects: [String] = [id];
 
   try {
     const user = User.build({
@@ -28,6 +30,7 @@ router.post('/register', async (req: Request, res: Response) => {
       petName,
       petSex,
       prevMatches,
+      prevRejects,
     });
     await user.save();
     return res.status(201).send();
@@ -47,11 +50,36 @@ router.post('/nextmatch', async (req: Request, res: Response) => {
   if (user === null) return;
 
   const otroUser = await User.findOne({
-    id: { $ne: user.id, $nin: user.prevMatches },
+    id: { $ne: user.id, $nin: user.prevMatches.concat(user.prevRejects) },
+    petCategory: { $eq: user.petCategory },
     petSex: { $ne: user.petSex },
   })
 
   return res.status(200).send(otroUser);
+});
+
+router.post('/reject', async (req: Request, res: Response) => {
+  const { _id, otro_id } =
+    req.body;
+
+  User.updateOne(
+    { id: _id },
+    { $addToSet: { prevRejects: otro_id } }
+  );
+
+  return res.status(200).send();
+});
+
+router.post('/match', async (req: Request, res: Response) => {
+  const { _id, otro_id } =
+    req.body;
+
+  User.updateOne(
+    { id: _id },
+    { $addToSet: { prevMatches: otro_id } }
+  );
+
+  return res.status(200).send();
 });
 
 export { router as UserRouter };
