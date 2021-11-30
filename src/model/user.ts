@@ -18,7 +18,7 @@ interface UserDoc extends mongoose.Document {
   firstName: String;
   lastName: String;
   mail: String;
-  password: String;
+  password?: String;
   petCategory: String;
   petName: String;
   petSex: String;
@@ -63,4 +63,4 @@ userSchema.statics.build = (attr: IUser) => {
 
 const User = mongoose.model<UserDoc, UserModelInterface>('User', userSchema);
 
-export { User };
+export { User, IUser };
