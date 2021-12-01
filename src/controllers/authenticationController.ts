@@ -42,6 +42,9 @@ class AuthenticationController {
       await this.user.create({
         ...userData,
         password: hashedPassword,
+        prevMatches: [userData.mail],
+        prevRejects: [userData.mail],
+        mutualMatches: [],
       });
       response.status(201).send();
     }

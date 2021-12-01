@@ -8,6 +8,9 @@ interface IUser {
   petCategory: string;
   petName: string;
   petSex: string;
+  prevMatches: [string];
+  prevRejects: [string];
+  mutualMatches: [string];
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -22,6 +25,9 @@ interface UserDoc extends mongoose.Document {
   petCategory: string;
   petName: string;
   petSex: string;
+  prevMatches: [string];
+  prevRejects: [string];
+  mutualMatches: [string];
 }
 
 const userSchema = new mongoose.Schema({
@@ -56,6 +62,18 @@ const userSchema = new mongoose.Schema({
     required: true,
     enum: ['MALE', 'FEMALE'],
   },
+  prevMatches: {
+    type: [String],
+    required: true,
+  },
+  prevRejects: {
+    type: [String],
+    required: true,
+  },
+  mutualMatches: {
+    type: [String],
+    required: true,
+  }
 });
 
 userSchema.statics.build = (attr: IUser) => {
