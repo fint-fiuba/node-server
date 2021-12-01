@@ -8,7 +8,7 @@ class CreateUserDto {
   public lastName!: string;
 
   @IsString()
-  public email!: string;
+  public mail!: string;
 
   @IsString()
   public password!: string;

@@ -13,7 +13,7 @@ class UsersController {
     this.router.get(this.path, this.getAllUsers);
   }
 
-  getAllUsers = async (request: Request, response: Response) => {
+  private getAllUsers = async (request: Request, response: Response) => {
     const users = await User.find({});
     response.send(users);
   };

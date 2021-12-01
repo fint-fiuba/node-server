@@ -1,17 +1,10 @@
-import mongoose from 'mongoose';
 import App from './app';
-import UsersController from './controllers/userController';
+import AuthenticationController from './controllers/authenticationController';
+import UsersController from './controllers/authenticationController';
 
-mongoose.connect(
-  'mongodb://localhost:27017/animaltinder',
-  {
-    autoCreate: true,
-  },
-  () => {
-    console.log('connected to database');
-  }
+const app = new App(
+  [new AuthenticationController(), new UsersController()],
+  3000
 );
-
-const app = new App([new UsersController()], 3000);
 
 app.listen();

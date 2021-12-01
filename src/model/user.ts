@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 
 interface IUser {
-  firstName: String;
-  lastName: String;
-  mail: String;
-  password: String;
-  petCategory: String;
-  petName: String;
-  petSex: String;
+  firstName: string;
+  lastName: string;
+  mail: string;
+  password: string;
+  petCategory: string;
+  petName: string;
+  petSex: string;
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -15,13 +15,13 @@ interface UserModelInterface extends mongoose.Model<UserDoc> {
 }
 
 interface UserDoc extends mongoose.Document {
-  firstName: String;
-  lastName: String;
-  mail: String;
-  password?: String;
-  petCategory: String;
-  petName: String;
-  petSex: String;
+  firstName: string;
+  lastName: string;
+  mail: string;
+  password: string;
+  petCategory: string;
+  petName: string;
+  petSex: string;
 }
 
 const userSchema = new mongoose.Schema({
@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    select: false,
   },
   petCategory: {
     type: String,

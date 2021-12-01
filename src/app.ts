@@ -1,5 +1,7 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import * as bodyParser from 'body-parser';
+import errorMiddleware from './middleware/errorMiddleware';
 
 class App {
   public app: express.Application;
@@ -9,8 +11,23 @@ class App {
     this.app = express();
     this.port = port;
 
+    this.connectToDB();
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
+
+    this.app.use(errorMiddleware);
+  }
+
+  private connectToDB() {
+    mongoose.connect(
+      'mongodb://localhost:27017/animaltinder',
+      {
+        autoCreate: true,
+      },
+      () => {
+        console.log('connected to database');
+      }
+    );
   }
 
   private initializeMiddlewares() {
