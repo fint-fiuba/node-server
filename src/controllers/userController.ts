@@ -6,6 +6,7 @@ import BadCredentialException from '../exceptions/BadCredentialsException';
 import NoNextMatchException from '../exceptions/NoNextMatchException';
 import Reject from './dto/reject.dto';
 import Match from './dto/match.dto';
+import MutualMatches from './dto/mutualmatches.dto';
 
 class UsersController {
   public path = '/user';
@@ -34,6 +35,11 @@ class UsersController {
       validationMiddleware(Match),
       this.match
     );
+    this.router.post(
+      `${this.path}/mutualmatches`,
+      validationMiddleware(MutualMatches),
+      this.mutualMatches
+    );
   }
 
   private getAllUsers = async (request: Request, response: Response) => {
@@ -46,9 +52,9 @@ class UsersController {
     response: Response,
     next: NextFunction
   ) => {
-    const logInData: NextMatch = request.body;
+    const nextMatchData: NextMatch = request.body;
     const user = await this.user
-      .findOne({ mail: logInData.mail })
+      .findOne({ mail: nextMatchData.mail })
       .exec();
     if (user) {
       const otherUser = await this.user
@@ -75,13 +81,15 @@ class UsersController {
     response: Response,
     next: NextFunction
   ) => {
-    const logInData: Reject = request.body;
+    const rejectData: Reject = request.body;
     const user = await this.user
-      .findOne({ mail: logInData.mail })
+      .findOne({ mail: rejectData.mail })
       .exec();
     if (user) {
-      await this.user.updateOne({ mail: logInData.mail },
-        { $push: { prevRejects: logInData.otherMail } });
+      await this.user.updateOne({ mail: rejectData.mail },
+        { $push: { prevRejects: rejectData.otherMail } });
+
+      response.status(200)
     } else {
       next(new BadCredentialException());
     }
@@ -92,19 +100,19 @@ class UsersController {
     response: Response,
     next: NextFunction
   ) => {
-    const logInData: Match = request.body;
+    const matchData: Match = request.body;
     const user = await this.user
-      .findOne({ mail: logInData.mail })
+      .findOne({ mail: matchData.mail })
       .exec();
     if (user) {
 
       const otherUser = await this.user
-        .findOne({ mail: logInData.otherMail })
+        .findOne({ mail: matchData.otherMail })
         .exec();
 
       if (otherUser) {
-        await this.user.updateOne({ mail: logInData.mail },
-          { $push: { prevMatches: logInData.otherMail } });
+        await this.user.updateOne({ mail: matchData.mail },
+          { $push: { prevMatches: matchData.otherMail } });
 
         if (user.mail in otherUser.prevMatches) {
           await this.user.updateOne({ mail: user.mail },
@@ -118,6 +126,27 @@ class UsersController {
       } else {
         next(new BadCredentialException());
       }
+    } else {
+      next(new BadCredentialException());
+    }
+  };
+
+  private mutualMatches = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    const mutualMatchesData: Reject = request.body;
+    const user = await this.user
+      .findOne({ mail: mutualMatchesData.mail })
+      .exec();
+    if (user) {
+      const mutualMatches = await this.user
+        .findOne({ mail: mutualMatchesData.mail })
+        .select('mutualMatches')
+        .exec();
+
+      response.status(200).send(mutualMatches);
     } else {
       next(new BadCredentialException());
     }
