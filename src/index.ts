@@ -4,7 +4,7 @@ import UsersController from './controllers/userController';
 
 const app = new App(
   [new AuthenticationController(), new UsersController()],
-  3000
+  3001
 );
 
 app.listen();

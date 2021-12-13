@@ -21,6 +21,10 @@ class CreateUserDto {
 
   @IsString()
   petSex!: String;
+
+  @IsString()
+  image!: String;
+
 }
 
 export default CreateUserDto;

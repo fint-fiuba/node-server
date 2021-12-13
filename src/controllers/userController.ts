@@ -93,7 +93,7 @@ class UsersController {
         { $push: { prevRejects: rejectData.otherMail } }
       );
 
-      response.status(200);
+      response.status(200).send();
     } else {
       next(new BadCredentialException());
     }
@@ -106,6 +106,7 @@ class UsersController {
   ) => {
     const matchData: Match = request.body;
     const user = await this.user.findOne({ mail: matchData.mail }).exec();
+    console.log(user);
     if (user) {
       const otherUser = await this.user
         .findOne({ mail: matchData.otherMail })
@@ -127,9 +128,10 @@ class UsersController {
             { mail: otherUser.mail },
             { $push: { mutualMatches: user.mail } }
           );
-
-          response.status(200).send();
         }
+
+        response.status(200).send();
+
       } else {
         next(new BadCredentialException());
       }
@@ -149,7 +151,7 @@ class UsersController {
       .exec();
     if (user) {
       const mutualMatches = await this.user
-        .findOne({ mail: mutualMatchesData.mail })
+        .findOne({ mail: mutualMatchesData.mail }, {_id: -1})
         .select('mutualMatches')
         .exec();
 

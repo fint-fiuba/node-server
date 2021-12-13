@@ -11,6 +11,7 @@ interface IUser {
   prevMatches: [string];
   prevRejects: [string];
   mutualMatches: [string];
+  image: string;
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -28,6 +29,7 @@ interface UserDoc extends mongoose.Document {
   prevMatches: [string];
   prevRejects: [string];
   mutualMatches: [string];
+  image: string;
 }
 
 const userSchema = new mongoose.Schema({
@@ -72,6 +74,10 @@ const userSchema = new mongoose.Schema({
   },
   mutualMatches: {
     type: [String],
+    required: true,
+  },
+  image: {
+    type: String,
     required: true,
   }
 });
