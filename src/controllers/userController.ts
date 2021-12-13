@@ -7,6 +7,7 @@ import NoNextMatchException from '../exceptions/NoNextMatchException';
 import Reject from './dto/reject.dto';
 import Match from './dto/match.dto';
 import MutualMatches from './dto/mutualmatches.dto';
+import authMiddleware from '../middleware/authMiddleware';
 
 class UsersController {
   public path = '/user';
@@ -20,7 +21,7 @@ class UsersController {
   public intializeRoutes() {
     this.router.get(this.path, this.getAllUsers);
 
-    this.router.post(
+    this.router.get(
       `${this.path}/nextmatch`,
       validationMiddleware(NextMatch),
       this.nextMatch
@@ -53,17 +54,20 @@ class UsersController {
     next: NextFunction
   ) => {
     const nextMatchData: NextMatch = request.body;
-    const user = await this.user
-      .findOne({ mail: nextMatchData.mail })
-      .exec();
+    const user = await this.user.findOne({ mail: nextMatchData.mail }).exec();
     if (user) {
       const otherUser = await this.user
         .findOne({})
-        .where('mail').ne(user.mail)
-        .where('mail').nin(user.prevMatches)
-        .where('mail').nin(user.prevRejects)
-        .where('petSex').ne(user.petSex)
-        .where('petCategory').equals(user.petCategory)
+        .where('mail')
+        .ne(user.mail)
+        .where('mail')
+        .nin(user.prevMatches)
+        .where('mail')
+        .nin(user.prevRejects)
+        .where('petSex')
+        .ne(user.petSex)
+        .where('petCategory')
+        .equals(user.petCategory)
         .exec();
 
       if (otherUser) {
@@ -82,14 +86,14 @@ class UsersController {
     next: NextFunction
   ) => {
     const rejectData: Reject = request.body;
-    const user = await this.user
-      .findOne({ mail: rejectData.mail })
-      .exec();
+    const user = await this.user.findOne({ mail: rejectData.mail }).exec();
     if (user) {
-      await this.user.updateOne({ mail: rejectData.mail },
-        { $push: { prevRejects: rejectData.otherMail } });
+      await this.user.updateOne(
+        { mail: rejectData.mail },
+        { $push: { prevRejects: rejectData.otherMail } }
+      );
 
-      response.status(200)
+      response.status(200);
     } else {
       next(new BadCredentialException());
     }
@@ -101,25 +105,28 @@ class UsersController {
     next: NextFunction
   ) => {
     const matchData: Match = request.body;
-    const user = await this.user
-      .findOne({ mail: matchData.mail })
-      .exec();
+    const user = await this.user.findOne({ mail: matchData.mail }).exec();
     if (user) {
-
       const otherUser = await this.user
         .findOne({ mail: matchData.otherMail })
         .exec();
 
       if (otherUser) {
-        await this.user.updateOne({ mail: matchData.mail },
-          { $push: { prevMatches: matchData.otherMail } });
+        await this.user.updateOne(
+          { mail: matchData.mail },
+          { $push: { prevMatches: matchData.otherMail } }
+        );
 
         if (user.mail in otherUser.prevMatches) {
-          await this.user.updateOne({ mail: user.mail },
-            { $push: { mutualMatches: otherUser.mail } });
+          await this.user.updateOne(
+            { mail: user.mail },
+            { $push: { mutualMatches: otherUser.mail } }
+          );
 
-          await this.user.updateOne({ mail: otherUser.mail },
-            { $push: { mutualMatches: user.mail } });
+          await this.user.updateOne(
+            { mail: otherUser.mail },
+            { $push: { mutualMatches: user.mail } }
+          );
 
           response.status(200).send();
         }
