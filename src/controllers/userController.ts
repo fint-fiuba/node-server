@@ -1,18 +1,18 @@
-import { NextFunction, Request, Response, Router } from 'express';
-import { IUser, User } from '../model/user';
-import NextMatch from './dto/nextmatch.dto';
-import validationMiddleware from '../middleware/validationMiddleware';
-import BadCredentialException from '../exceptions/BadCredentialsException';
-import NoNextMatchException from '../exceptions/NoNextMatchException';
-import Reject from './dto/reject.dto';
-import Match from './dto/match.dto';
-import GetUser from './dto/get_user.dto';
-import UpdateUser from './dto/update.dto';
-import MutualMatches from './dto/mutualmatches.dto';
-import authMiddleware from '../middleware/authMiddleware';
+import { NextFunction, Request, Response, Router } from "express";
+import { IUser, User } from "../model/user";
+import NextMatch from "./dto/nextmatch.dto";
+import validationMiddleware from "../middleware/validationMiddleware";
+import BadCredentialException from "../exceptions/BadCredentialsException";
+import NoNextMatchException from "../exceptions/NoNextMatchException";
+import Reject from "./dto/reject.dto";
+import Match from "./dto/match.dto";
+import GetUser from "./dto/get_user.dto";
+import UpdateUser from "./dto/update.dto";
+import MutualMatches from "./dto/mutualmatches.dto";
+import authMiddleware from "../middleware/authMiddleware";
 
 class UsersController {
-  public path = '/user';
+  public path = "/user";
   public router = Router();
   private user = User;
 
@@ -21,16 +21,9 @@ class UsersController {
   }
 
   public intializeRoutes() {
-    this.router.get(this.path,
-      validationMiddleware(GetUser),
-      this.getUser
-    );
+    this.router.get(this.path, validationMiddleware(GetUser), this.getUser);
 
-    this.router.get(
-      `${this.path}/nextmatch`,
-      validationMiddleware(NextMatch),
-      this.nextMatch
-    );
+    this.router.get(`${this.path}/nextmatch`, this.nextMatch);
     this.router.post(
       `${this.path}/reject`,
       validationMiddleware(Reject),
@@ -53,7 +46,11 @@ class UsersController {
     );
   }
 
-  private getUser = async (request: Request, response: Response, next: NextFunction) => {
+  private getUser = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
     const userData: GetUser = request.body;
     const user = await User.find({ mail: userData.mail }).exec();
     if (user) {
@@ -63,17 +60,33 @@ class UsersController {
     }
   };
 
-  private update = async (request: Request, response: Response, next: NextFunction) => {
+  private update = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
     const userData: UpdateUser = request.body;
     const user = await User.findOne({ mail: userData.mail });
 
     if (user) {
-      if (userData.firstName) { user.firstName = userData.firstName };
-      if (userData.lastName) { user.lastName = userData.lastName };
-      if (userData.petCategory) { user.petCategory = userData.petCategory };
-      if (userData.petName) { user.petName = userData.petName };
-      if (userData.petSex) { user.petSex = userData.petSex };
-      if (userData.image) { user.image = userData.image };
+      if (userData.firstName) {
+        user.firstName = userData.firstName;
+      }
+      if (userData.lastName) {
+        user.lastName = userData.lastName;
+      }
+      if (userData.petCategory) {
+        user.petCategory = userData.petCategory;
+      }
+      if (userData.petName) {
+        user.petName = userData.petName;
+      }
+      if (userData.petSex) {
+        user.petSex = userData.petSex;
+      }
+      if (userData.image) {
+        user.image = userData.image;
+      }
 
       user.save();
 
@@ -88,28 +101,31 @@ class UsersController {
     response: Response,
     next: NextFunction
   ) => {
-    const nextMatchData: NextMatch = request.body;
-    const user = await this.user.findOne({ mail: nextMatchData.mail }).exec();
+    const nextM = request.query.mail;
+    if (!nextM || !(typeof nextM === "string")) {
+      next(new NoNextMatchException());
+      return;
+    }
+
+    const user = await this.user.findOne({ mail: nextM }).exec();
+  
     if (user) {
       const otherUser = await this.user
         .findOne({})
-        .where('mail')
+        .where("mail")
         .ne(user.mail)
-        .where('mail')
+        .where("mail")
         .nin(user.prevMatches)
-        .where('mail')
+        .where("mail")
         .nin(user.prevRejects)
-        .where('petSex')
+        .where("petSex")
         .ne(user.petSex)
-        .where('petCategory')
+        .where("petCategory")
         .equals(user.petCategory)
         .exec();
 
-      if (otherUser) {
-        response.status(200).send(otherUser);
-      } else {
-        next(new NoNextMatchException());
-      }
+      response.status(200).send(otherUser);
+
     } else {
       next(new BadCredentialException());
     }
@@ -166,7 +182,6 @@ class UsersController {
         }
 
         response.status(200).send();
-
       } else {
         next(new BadCredentialException());
       }
@@ -187,7 +202,7 @@ class UsersController {
     if (user) {
       const mutualMatches = await this.user
         .findOne({ mail: mutualMatchesData.mail }, { _id: -1 })
-        .select('mutualMatches')
+        .select("mutualMatches")
         .exec();
 
       response.status(200).send(mutualMatches);
