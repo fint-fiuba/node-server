@@ -34,7 +34,18 @@ class App {
   private initializeMiddlewares() {
     this.app.use(bodyParser.json({"limit": "10mb"}));
     this.app.use(cookieParser());
+
+    const cors = require('cors');
+    const corsOptions ={
+        origin:'http://localhost:3000', 
+        credentials : true,            //access-control-allow-credentials:true
+        exposedHeaders: ["set-cookie"],
+    }
+    this.app.use(cors(corsOptions));
+
   }
+
+
 
   private initializeControllers(controllers: any[]) {
     controllers.forEach(controller => {
