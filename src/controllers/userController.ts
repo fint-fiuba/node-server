@@ -21,7 +21,7 @@ class UsersController {
   }
 
   public intializeRoutes() {
-    this.router.get(this.path, validationMiddleware(GetUser), this.getUser);
+    this.router.get(this.path, this.getUser);
 
     this.router.get(`${this.path}/nextmatch`, this.nextMatch);
     this.router.post(
@@ -51,8 +51,12 @@ class UsersController {
     response: Response,
     next: NextFunction
   ) => {
-    const userData: GetUser = request.body;
-    const user = await User.find({ mail: userData.mail }).exec();
+    const userMail = request.query.mail;
+    if (!userMail || !(typeof userMail === "string")) {
+      next(new NoNextMatchException());
+      return;
+    }
+    const user = await User.find({ mail: userMail }).exec();
     if (user) {
       response.status(200).send(user);
     } else {
@@ -69,24 +73,14 @@ class UsersController {
     const user = await User.findOne({ mail: userData.mail });
 
     if (user) {
-      if (userData.firstName) {
-        user.firstName = userData.firstName;
-      }
-      if (userData.lastName) {
-        user.lastName = userData.lastName;
-      }
-      if (userData.petCategory) {
-        user.petCategory = userData.petCategory;
-      }
-      if (userData.petName) {
-        user.petName = userData.petName;
-      }
-      if (userData.petSex) {
-        user.petSex = userData.petSex;
-      }
-      if (userData.image) {
-        user.image = userData.image;
-      }
+
+      user.firstName = userData.firstName;
+      user.lastName = userData.lastName;
+      user.petCategory = userData.petCategory;
+      user.petName = userData.petName;
+      user.petSex = userData.petSex;
+      user.image = userData.image;
+      user.petAge = userData.petAge;
 
       user.save();
 
@@ -108,7 +102,7 @@ class UsersController {
     }
 
     const user = await this.user.findOne({ mail: nextM }).exec();
-  
+
     if (user) {
       const otherUser = await this.user
         .findOne({})

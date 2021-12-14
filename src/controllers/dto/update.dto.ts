@@ -1,27 +1,30 @@
-import { IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 
 class UpdateUser {
     @IsString()
-    public firstName?: string;
+    public firstName!: string;
 
     @IsString()
-    public lastName?: string;
+    public lastName!: string;
 
     @IsString()
-    public mail?: string;
+    public mail!: string;
 
 
     @IsString()
-    petCategory?: string;
+    petCategory!: string;
 
     @IsString()
-    petName?: string;
+    petName!: string;
 
     @IsString()
-    petSex?: string;
+    petSex!: string;
 
     @IsString()
-    image?: string;
+    image!: string;
+
+    @IsNumber()
+    petAge!: number;
 
 }
 

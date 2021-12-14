@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 class CreateUserDto {
   @IsString()
@@ -24,6 +24,9 @@ class CreateUserDto {
 
   @IsString()
   image!: String;
+
+  @IsNumber()
+  petAge!: Number;
 
 }
 
