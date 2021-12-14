@@ -75,6 +75,8 @@ class UsersController {
       if (userData.petSex) { user.petSex = userData.petSex };
       if (userData.image) { user.image = userData.image };
 
+      user.save();
+
       response.status(200).send();
     } else {
       next(new BadCredentialException());
