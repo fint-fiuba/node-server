@@ -194,15 +194,20 @@ class UsersController {
       return;
     }
     const user = await this.user
-      .findOne({ mail: mutualMatchesData.mail })
+      .findOne({ mail: userMail })
       .exec();
     if (user) {
       const mutualMatches = await this.user
-        .findOne({ mail: mutualMatchesData.mail }, { _id: -1 })
+        .findOne({ mail: userMail }, { _id: -1 })
         .select("mutualMatches")
         .exec();
 
-      response.status(200).send(mutualMatches);
+      if (mutualMatches) {
+        const userMatches = await this.user.find({}).where("mail").in(mutualMatches.mutualMatches).exec();
+        response.send(200).send(userMatches);
+      } else {
+        response.status(200).send();
+      }
     } else {
       next(new BadCredentialException());
     }
