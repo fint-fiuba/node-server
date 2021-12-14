@@ -34,9 +34,8 @@ class UsersController {
       validationMiddleware(Match),
       this.match
     );
-    this.router.post(
+    this.router.get(
       `${this.path}/mutualmatches`,
-      validationMiddleware(MutualMatches),
       this.mutualMatches
     );
     this.router.post(
@@ -189,7 +188,11 @@ class UsersController {
     response: Response,
     next: NextFunction
   ) => {
-    const mutualMatchesData: Reject = request.body;
+    const userMail = request.query.mail;
+    if (!userMail || !(typeof userMail === "string")) {
+      next(new NoNextMatchException());
+      return;
+    }
     const user = await this.user
       .findOne({ mail: mutualMatchesData.mail })
       .exec();
