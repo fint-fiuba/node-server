@@ -25,7 +25,7 @@ class CreateUserDto {
   @IsString()
   image!: String;
 
-  @IsNumber()
+  @IsString()
   petAge!: String;
 
 }
