@@ -24,7 +24,7 @@ class UpdateUser {
     image!: string;
 
     @IsNumber()
-    petAge!: number;
+    petAge!: string;
 
 }
 

@@ -12,7 +12,7 @@ interface IUser {
   prevRejects: [string];
   mutualMatches: [string];
   image: string;
-  petAge: number;
+  petAge: string;
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -31,7 +31,7 @@ interface UserDoc extends mongoose.Document {
   prevRejects: [string];
   mutualMatches: [string];
   image: string;
-  petAge: number;
+  petAge: string;
 }
 
 const userSchema = new mongoose.Schema({
@@ -83,7 +83,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   petAge: {
-    type: Number,
+    type: String,
     required: true,
   }
 });
