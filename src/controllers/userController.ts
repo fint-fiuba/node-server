@@ -6,6 +6,8 @@ import BadCredentialException from '../exceptions/BadCredentialsException';
 import NoNextMatchException from '../exceptions/NoNextMatchException';
 import Reject from './dto/reject.dto';
 import Match from './dto/match.dto';
+import GetUser from './dto/get_user.dto';
+import UpdateUser from './dto/update.dto';
 import MutualMatches from './dto/mutualmatches.dto';
 import authMiddleware from '../middleware/authMiddleware';
 
@@ -19,7 +21,10 @@ class UsersController {
   }
 
   public intializeRoutes() {
-    this.router.get(this.path, this.getAllUsers);
+    this.router.get(this.path,
+      validationMiddleware(GetUser),
+      this.getUser
+    );
 
     this.router.get(
       `${this.path}/nextmatch`,
@@ -41,11 +46,39 @@ class UsersController {
       validationMiddleware(MutualMatches),
       this.mutualMatches
     );
+    this.router.post(
+      `${this.path}/update`,
+      validationMiddleware(UpdateUser),
+      this.update
+    );
   }
 
-  private getAllUsers = async (request: Request, response: Response) => {
-    const users = await User.find({});
-    response.send(users);
+  private getUser = async (request: Request, response: Response, next: NextFunction) => {
+    const userData: GetUser = request.body;
+    const user = await User.find({ mail: userData.mail }).exec();
+    if (user) {
+      response.status(200).send(user);
+    } else {
+      next(new BadCredentialException());
+    }
+  };
+
+  private update = async (request: Request, response: Response, next: NextFunction) => {
+    const userData: UpdateUser = request.body;
+    const user = await User.findOne({ mail: userData.mail });
+
+    if (user) {
+      if (userData.firstName) { user.firstName = userData.firstName };
+      if (userData.lastName) { user.lastName = userData.lastName };
+      if (userData.petCategory) { user.petCategory = userData.petCategory };
+      if (userData.petName) { user.petName = userData.petName };
+      if (userData.petSex) { user.petSex = userData.petSex };
+      if (userData.image) { user.image = userData.image };
+
+      response.status(200).send();
+    } else {
+      next(new BadCredentialException());
+    }
   };
 
   private nextMatch = async (
@@ -151,7 +184,7 @@ class UsersController {
       .exec();
     if (user) {
       const mutualMatches = await this.user
-        .findOne({ mail: mutualMatchesData.mail }, {_id: -1})
+        .findOne({ mail: mutualMatchesData.mail }, { _id: -1 })
         .select('mutualMatches')
         .exec();
 
