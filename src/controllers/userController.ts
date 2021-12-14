@@ -150,7 +150,6 @@ class UsersController {
   ) => {
     const matchData: Match = request.body;
     const user = await this.user.findOne({ mail: matchData.mail }).exec();
-    console.log(user);
     if (user) {
       const otherUser = await this.user
         .findOne({ mail: matchData.otherMail })
@@ -204,7 +203,7 @@ class UsersController {
 
       if (mutualMatches) {
         const userMatches = await this.user.find({}).where("mail").in(mutualMatches.mutualMatches).exec();
-        response.send(200).send(userMatches);
+        response.status(200).send(userMatches);
       } else {
         response.status(200).send();
       }
