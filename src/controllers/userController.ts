@@ -56,7 +56,7 @@ class UsersController {
       next(new NoNextMatchException());
       return;
     }
-    const user = await User.find({ mail: userMail }).exec();
+    const user = await User.findOne({ mail: userMail }).exec();
     if (user) {
       response.status(200).send(user);
     } else {
