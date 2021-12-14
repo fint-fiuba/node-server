@@ -15,13 +15,13 @@ class UpdateUser {
     petCategory?: string;
 
     @IsString()
-    petName?: String;
+    petName?: string;
 
     @IsString()
-    petSex?: String;
+    petSex?: string;
 
     @IsString()
-    image?: String;
+    image?: string;
 
 }
 
