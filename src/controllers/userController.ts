@@ -104,18 +104,30 @@ class UsersController {
 
     if (user) {
       const otherUser = await this.user
-        .findOne({})
-        .where("mail")
-        .ne(user.mail)
-        .where("mail")
-        .nin(user.prevMatches)
-        .where("mail")
-        .nin(user.prevRejects)
-        .where("petSex")
-        .ne(user.petSex)
-        .where("petCategory")
-        .equals(user.petCategory)
-        .exec();
+      .findOne({
+          $and: [{
+              mail: {
+                  $ne: user.mail
+              }
+          }, {
+              mail: {
+                  $nin: user.prevMatches
+              }
+          }, {
+              mail: {
+                  $nin: user.prevRejects
+              }
+          }, {
+              petSex: {
+                  $ne: user.petSex
+              }
+          }, {
+              petCategory: {
+                  $eq: user.petCategory
+              }
+          }]
+      })
+      .exec();
 
       response.status(200).send(otherUser);
 
